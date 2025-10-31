@@ -38,5 +38,56 @@ class Settings(BaseSettings):
     NEWS_FETCH_BATCH_SIZE: int = 10
     FUNDAMENTAL_FETCH_BATCH_SIZE: int = 10
 
+    # Feature engineering configuration
+    FEATURE_LOOKBACK_DAYS: int = 400
+    FUND_FFILL_DAYS: int = 120
+    COMPOSITE_WEIGHTS: str = '{"quality": 0.25, "valuation": 0.25, "momentum": 0.25, "sentiment": 0.25}'
+    SECTOR_MAP_PATH: str = ""
+    ENABLE_FEATURES_TASK: bool = False
+
 
 settings = Settings()
+
+
+def get_composite_weights() -> dict[str, float]:
+    """Parse composite weights from config.
+    
+    Returns:
+        Dictionary with weights for quality, valuation, momentum, sentiment
+    """
+    import json
+    try:
+        weights = json.loads(settings.COMPOSITE_WEIGHTS)
+        # Ensure all required keys exist with defaults
+        return {
+            "quality": weights.get("quality", 0.25),
+            "valuation": weights.get("valuation", 0.25),
+            "momentum": weights.get("momentum", 0.25),
+            "sentiment": weights.get("sentiment", 0.25),
+        }
+    except json.JSONDecodeError:
+        # Return defaults if parsing fails
+        return {"quality": 0.25, "valuation": 0.25, "momentum": 0.25, "sentiment": 0.25}
+
+
+def load_sector_mapping() -> dict[str, str] | None:
+    """Load optional sector mapping from file.
+    
+    Returns:
+        Dictionary mapping ticker to sector, or None if not available
+    """
+    if not settings.SECTOR_MAP_PATH:
+        return None
+    
+    try:
+        import json
+        from pathlib import Path
+        
+        path = Path(settings.SECTOR_MAP_PATH)
+        if not path.exists():
+            return None
+            
+        with open(path, "r") as f:
+            return json.load(f)
+    except Exception:
+        return None
