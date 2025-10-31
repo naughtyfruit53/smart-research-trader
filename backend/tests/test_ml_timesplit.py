@@ -1,6 +1,6 @@
 """Tests for time-series cross-validation splits."""
 
-from datetime import date
+from datetime import date, timedelta
 
 import numpy as np
 import pandas as pd
@@ -94,7 +94,8 @@ def test_expanding_window_split_insufficient_data():
 
 def test_expanding_window_split_with_list():
     """Test splits work with list of dates."""
-    dates = [date(2024, 1, i) for i in range(1, 51)]
+    # Create 50 dates spanning multiple months
+    dates = [date(2024, 1, 1) + timedelta(days=i) for i in range(50)]
 
     splits = expanding_window_split(dates, n_splits=3, embargo_days=0, test_size=0.2)
 

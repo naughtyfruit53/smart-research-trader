@@ -172,7 +172,12 @@ class LGBMForecaster:
             callbacks=callbacks,
         )
 
-        self.best_iteration = self.model.best_iteration
+        # best_iteration is -1 if no early stopping was used
+        self.best_iteration = (
+            self.model.best_iteration
+            if self.model.best_iteration > 0
+            else self.model.num_trees()
+        )
 
         logger.info(
             f"Trained LightGBM model: {self.best_iteration} iterations, "
@@ -226,7 +231,16 @@ class LGBMForecaster:
         n_trees_to_use = min(n_trees, self.best_iteration)
         tree_preds = []
 
-        for i in range(max(1, self.best_iteration - n_trees_to_use), self.best_iteration + 1):
+        # Ensure at least 2 iterations for std calculation
+        start_iter = max(1, self.best_iteration - n_trees_to_use + 1)
+        end_iter = self.best_iteration
+
+        if start_iter >= end_iter:
+            # If only 1 iteration, just return prediction with std=0
+            pred = self.model.predict(X_arr, num_iteration=end_iter)
+            return pred, np.zeros_like(pred)
+
+        for i in range(start_iter, end_iter + 1):
             pred = self.model.predict(X_arr, num_iteration=i)
             tree_preds.append(pred)
 

@@ -85,9 +85,9 @@ def expanding_window_split(
 
         # Apply embargo: train ends embargo_days before test start
         if embargo_days > 0:
-            train_end_date = test_start_date - timedelta(days=embargo_days)
+            train_end_date = test_start_date - pd.Timedelta(days=embargo_days)
         else:
-            train_end_date = test_start_date - timedelta(days=1)
+            train_end_date = test_start_date - pd.Timedelta(days=1)
 
         # Train indices: all data up to train_end_date
         train_mask = dates_sorted <= train_end_date
