@@ -1,7 +1,7 @@
 """Time-series cross-validation with expanding window and embargo."""
 
 import logging
-from datetime import date, timedelta
+from datetime import date
 
 import numpy as np
 import pandas as pd

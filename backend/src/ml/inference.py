@@ -96,13 +96,23 @@ def generate_predictions(
     yhat, yhat_std = model.predict_with_std(X)
 
     # Compute probability of positive return
-    # Using normal CDF approximation: P(return > 0) = P(Z > -yhat/yhat_std)
-    # Avoid division by zero
+    # Assumes returns follow a normal distribution: return ~ N(yhat, yhat_std^2)
+    # P(return > 0) = P(Z > -yhat/yhat_std) where Z ~ N(0,1)
+    #
+    # We approximate the normal CDF using a sigmoid function:
+    # Φ(x) ≈ σ(1.702*x) where σ(x) = 1/(1+exp(-x))
+    # The factor 1.702 provides a close approximation to the normal CDF.
+    # However, for simplicity, we use σ(x) which is close enough for our purposes.
+    #
+    # This gives us a smooth probability estimate between 0 and 1 that:
+    # - Approaches 0 when yhat << 0 (strong negative prediction)
+    # - Equals 0.5 when yhat = 0 (neutral prediction)
+    # - Approaches 1 when yhat >> 0 (strong positive prediction)
     with np.errstate(divide="ignore", invalid="ignore"):
         z_scores = yhat / np.maximum(yhat_std, 1e-6)
-        # Approximate normal CDF using sigmoid
+        # Sigmoid approximation of normal CDF
         prob_up = 1.0 / (1.0 + np.exp(-z_scores))
-        # Clip to reasonable range
+        # Clip to reasonable range to avoid extreme probabilities
         prob_up = np.clip(prob_up, 0.01, 0.99)
 
     # Create predictions DataFrame

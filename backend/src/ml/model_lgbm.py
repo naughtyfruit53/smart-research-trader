@@ -172,11 +172,10 @@ class LGBMForecaster:
             callbacks=callbacks,
         )
 
-        # best_iteration is -1 if no early stopping was used
+        # When early stopping is not used or no improvement found, best_iteration is 0
+        # In that case, use the total number of trees built
         self.best_iteration = (
-            self.model.best_iteration
-            if self.model.best_iteration > 0
-            else self.model.num_trees()
+            self.model.best_iteration if self.model.best_iteration > 0 else self.model.num_trees()
         )
 
         logger.info(
