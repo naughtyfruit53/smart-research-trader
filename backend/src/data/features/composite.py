@@ -3,7 +3,6 @@
 import logging
 
 import pandas as pd
-from sklearn.preprocessing import RobustScaler
 
 from src.core.config import get_composite_weights
 
