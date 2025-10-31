@@ -3,7 +3,7 @@
 import logging
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, HTTPException, Path
+from fastapi import APIRouter, Depends, Path
 from sqlalchemy.orm import Session
 
 from src.db.repo import PriceRepository, get_stock_snapshot
@@ -30,30 +30,30 @@ def get_stock(
     db: Annotated[Session, Depends(get_db)],
 ) -> StockSnapshot:
     """Get complete stock snapshot with all metrics.
-    
+
     Returns:
         - Latest fundamentals snapshot
         - Recent technicals (RSI, SMAs, momentum, volatility)
         - Sentiment aggregates
         - Latest prediction and scores
         - Price series for chart (last 200 trading days)
-    
+
     Examples:
         GET /stocks/AAPL
         GET /stocks/RELIANCE.NS
     """
     logger.info(f"Getting stock snapshot for {ticker}")
-    
+
     # Get snapshot data
     snapshot_data = get_stock_snapshot(db, ticker)
-    
+
     # Get price series for chart
     prices = PriceRepository.get_price_series(db, ticker, lookback_days=200)
-    
+
     # Build price series (reverse to chronological order)
     price_dates = [p.dt.strftime("%Y-%m-%d") for p in reversed(prices)]
     price_closes = [float(p.close) for p in reversed(prices)]
-    
+
     # Build response
     return StockSnapshot(
         ticker=ticker,

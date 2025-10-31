@@ -1,6 +1,6 @@
 """Repository helpers for common database operations."""
 
-from datetime import date, timedelta
+from datetime import date
 from typing import Any
 from uuid import UUID
 
@@ -32,12 +32,12 @@ class PriceRepository:
     @staticmethod
     def get_price_series(db: Session, ticker: str, lookback_days: int = 200) -> list[Price]:
         """Get price series for a ticker for the last N trading days.
-        
+
         Args:
             db: Database session
             ticker: Stock ticker symbol
             lookback_days: Number of trading days to retrieve
-            
+
         Returns:
             List of Price objects ordered by date descending
         """
@@ -119,11 +119,11 @@ class FeatureRepository:
     @staticmethod
     def get_latest_features_for_preds(db: Session, horizon: str = "1d") -> list[tuple[Pred, Feature]]:
         """Get latest predictions with their corresponding features.
-        
+
         Args:
             db: Database session
             horizon: Prediction horizon
-            
+
         Returns:
             List of (Pred, Feature) tuples
         """
@@ -134,7 +134,7 @@ class FeatureRepository:
             .group_by(Pred.ticker)
             .subquery()
         )
-        
+
         # Join preds with features
         stmt = (
             select(Pred, Feature)
@@ -142,7 +142,7 @@ class FeatureRepository:
             .join(Feature, (Pred.ticker == Feature.ticker) & (Pred.dt == Feature.dt))
             .where(Pred.horizon == horizon)
         )
-        
+
         return list(db.execute(stmt).all())
 
 
@@ -179,39 +179,39 @@ class PredRepository:
         db: Session, horizon: str = "1d", tickers: list[str] | None = None, limit: int | None = None
     ) -> list[Pred]:
         """Get latest predictions per ticker for a given horizon.
-        
+
         Args:
             db: Database session
             horizon: Prediction horizon (default: "1d")
             tickers: Optional list of tickers to filter
             limit: Optional limit on number of results
-            
+
         Returns:
             List of latest predictions
         """
         # Get latest date per ticker for this horizon
         from sqlalchemy import func
-        
+
         subquery = (
             select(Pred.ticker, func.max(Pred.dt).label("max_dt"))
             .where(Pred.horizon == horizon)
         )
-        
+
         if tickers:
             subquery = subquery.where(Pred.ticker.in_(tickers))
-        
+
         subquery = subquery.group_by(Pred.ticker).subquery()
-        
+
         # Join to get full prediction records
         stmt = (
             select(Pred)
             .join(subquery, (Pred.ticker == subquery.c.ticker) & (Pred.dt == subquery.c.max_dt))
             .where(Pred.horizon == horizon)
         )
-        
+
         if limit:
             stmt = stmt.limit(limit)
-        
+
         return list(db.execute(stmt).scalars())
 
 
@@ -233,7 +233,7 @@ class BacktestRepository:
     @staticmethod
     def get_latest_backtest(db: Session) -> Backtest | None:
         """Get the most recent completed backtest by finished_at.
-        
+
         Returns:
             Most recent backtest or None if no completed backtests exist
         """
@@ -269,11 +269,11 @@ class BacktestRepository:
 
 def get_stock_snapshot(db: Session, ticker: str) -> dict[str, Any]:
     """Get complete stock snapshot with all metrics.
-    
+
     Args:
         db: Database session
         ticker: Stock ticker symbol
-        
+
     Returns:
         Dictionary with fundamentals, technicals, sentiment, prediction, scores
     """
@@ -285,7 +285,7 @@ def get_stock_snapshot(db: Session, ticker: str) -> dict[str, Any]:
         "prediction": {},
         "scores": {},
     }
-    
+
     # Get latest fundamentals
     fund = FundamentalRepository.get_latest_by_ticker(db, ticker)
     if fund:
@@ -304,13 +304,13 @@ def get_stock_snapshot(db: Session, ticker: str) -> dict[str, Any]:
             "div_yield": fund.div_yield,
             "asof": fund.asof,
         }
-    
+
     # Get latest features for technicals, sentiment, and scores
     features = FeatureRepository.get_latest_by_ticker(db, ticker, limit=1)
     if features:
         feat = features[0]
         fj = feat.features_json or {}
-        
+
         result["technicals"] = {
             "rsi14": fj.get("rsi14"),
             "sma20": fj.get("sma20"),
@@ -320,13 +320,13 @@ def get_stock_snapshot(db: Session, ticker: str) -> dict[str, Any]:
             "momentum60": fj.get("momentum60"),
             "rv20": fj.get("rv20"),
         }
-        
+
         result["sentiment"] = {
             "sent_mean_comp": fj.get("sent_mean_comp"),
             "burst_3d": fj.get("burst_3d"),
             "burst_7d": fj.get("burst_7d"),
         }
-        
+
         result["scores"] = {
             "quality_score": fj.get("quality_score"),
             "valuation_score": fj.get("valuation_score"),
@@ -335,7 +335,7 @@ def get_stock_snapshot(db: Session, ticker: str) -> dict[str, Any]:
             "composite_score": fj.get("composite_score"),
             "risk_adjusted_score": fj.get("risk_adjusted_score"),
         }
-    
+
     # Get latest prediction
     preds = PredRepository.get_by_ticker(db, ticker, limit=1)
     if preds:
@@ -347,5 +347,5 @@ def get_stock_snapshot(db: Session, ticker: str) -> dict[str, Any]:
             "dt": pred.dt,
             "horizon": pred.horizon,
         }
-    
+
     return result
