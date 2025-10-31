@@ -51,13 +51,18 @@ class Settings(BaseSettings):
     FEATURES_TASK_HOUR: int = 23
     FEATURES_TASK_MINUTE: int = 30
 
+    # API scoring and signal configuration
+    RISK_SCORE_WEIGHT: float = 0.7  # Blend weight between base_score and composite_score
+    SIGNAL_TOP_DEFAULT: int = 50  # Default number of top signals to return
+    SHAP_TOP_K: int = 12  # Number of top SHAP features to return
+
 
 settings = Settings()
 
 
 def get_composite_weights() -> dict[str, float]:
     """Parse composite weights from config.
-    
+
     Returns:
         Dictionary with weights for quality, valuation, momentum, sentiment
     """
@@ -77,19 +82,19 @@ def get_composite_weights() -> dict[str, float]:
 
 def load_sector_mapping() -> dict[str, str] | None:
     """Load optional sector mapping from file.
-    
+
     Returns:
         Dictionary mapping ticker to sector, or None if not available
     """
     if not settings.SECTOR_MAP_PATH:
         return None
-    
+
     try:
         path = Path(settings.SECTOR_MAP_PATH)
         if not path.exists():
             return None
-            
-        with open(path, "r") as f:
+
+        with open(path) as f:
             return json.load(f)
     except Exception:
         return None
