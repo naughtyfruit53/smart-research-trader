@@ -235,6 +235,8 @@ def _upsert_features(df: pd.DataFrame) -> dict[str, int]:
             dt = dt.date()
         
         # Build features_json dict (all columns except ticker, dt)
+        import numpy as np
+        
         features_json = {}
         for col in df.columns:
             if col not in ["ticker", "dt"]:
@@ -244,8 +246,12 @@ def _upsert_features(df: pd.DataFrame) -> dict[str, int]:
                     features_json[col] = None
                 elif isinstance(val, (pd.Timestamp, datetime)):
                     features_json[col] = val.isoformat()
+                elif isinstance(val, (bool, np.bool_)):
+                    features_json[col] = bool(val)
+                elif isinstance(val, (int, float, np.integer, np.floating)):
+                    features_json[col] = float(val)
                 else:
-                    features_json[col] = float(val) if isinstance(val, (int, float)) else val
+                    features_json[col] = val
         
         record = {
             "ticker": ticker,

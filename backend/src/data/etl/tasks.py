@@ -127,7 +127,9 @@ beat_schedule_config = {
 if settings.ENABLE_FEATURES_TASK:
     beat_schedule_config["compute-features-daily"] = {
         "task": "compute_features_daily",
-        "schedule": crontab(hour=23, minute=30),  # Run at 11:30 PM UTC daily, after news
+        "schedule": crontab(
+            hour=settings.FEATURES_TASK_HOUR, minute=settings.FEATURES_TASK_MINUTE
+        ),  # Configurable via env (default: 11:30 PM UTC, after news)
     }
 
 celery_app.conf.beat_schedule = beat_schedule_config

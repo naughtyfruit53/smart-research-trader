@@ -154,5 +154,7 @@ def test_technical_indicators_empty_dataframe():
     
     result = compute_technical_indicators(df)
     
+    # Should maintain consistent schema with indicator columns
     assert result.empty
-    assert list(result.columns) == list(df.columns)
+    assert "sma_20" in result.columns
+    assert "rsi_14" in result.columns

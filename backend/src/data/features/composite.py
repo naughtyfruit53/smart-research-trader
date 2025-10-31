@@ -113,6 +113,7 @@ def _compute_valuation_score(df: pd.DataFrame) -> pd.DataFrame:
 def _compute_momentum_score(df: pd.DataFrame) -> pd.DataFrame:
     """Compute momentum score from technical indicators."""
     momentum_cols = []
+    has_rsi_normalized = False
     
     if "momentum_20" in df.columns:
         momentum_cols.append("momentum_20")
@@ -122,22 +123,24 @@ def _compute_momentum_score(df: pd.DataFrame) -> pd.DataFrame:
         # RSI is already in [0, 100] range, normalize to [0, 1]
         df["rsi_normalized"] = df["rsi_14"] / 100.0
         momentum_cols.append("rsi_normalized")
+        has_rsi_normalized = True
     
     if not momentum_cols:
         logger.warning("No momentum metrics available, setting momentum_score to 0.5")
         df["momentum_score"] = 0.5
         return df
     
-    scaled_scores = []
-    for col in momentum_cols:
-        scaled = _scale_to_01(df, col)
-        scaled_scores.append(scaled)
-    
-    df["momentum_score"] = pd.concat(scaled_scores, axis=1).mean(axis=1)
-    
-    # Clean up temporary column
-    if "rsi_normalized" in df.columns:
-        df = df.drop(columns=["rsi_normalized"])
+    try:
+        scaled_scores = []
+        for col in momentum_cols:
+            scaled = _scale_to_01(df, col)
+            scaled_scores.append(scaled)
+        
+        df["momentum_score"] = pd.concat(scaled_scores, axis=1).mean(axis=1)
+    finally:
+        # Clean up temporary column (even if error occurs)
+        if has_rsi_normalized and "rsi_normalized" in df.columns:
+            df = df.drop(columns=["rsi_normalized"])
     
     return df
 

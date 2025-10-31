@@ -48,6 +48,8 @@ class Settings(BaseSettings):
     COMPOSITE_WEIGHTS: str = '{"quality": 0.25, "valuation": 0.25, "momentum": 0.25, "sentiment": 0.25}'
     SECTOR_MAP_PATH: str = ""
     ENABLE_FEATURES_TASK: bool = False
+    FEATURES_TASK_HOUR: int = 23
+    FEATURES_TASK_MINUTE: int = 30
 
 
 settings = Settings()

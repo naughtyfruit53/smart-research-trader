@@ -134,14 +134,18 @@ def test_compute_features_multiple_tickers(db_session: Session):
 
 def _insert_fixture_prices(session: Session):
     """Insert fixture price data for testing."""
+    from datetime import timedelta
+    
     prices = []
-    for i in range(1, 31):  # 30 days of data
+    base_date = date(2024, 1, 1)
+    for i in range(30):  # 30 days of data
+        current_date = base_date + timedelta(days=i)
         for ticker in ["AAPL", "MSFT"]:
             base_price = 100.0 if ticker == "AAPL" else 200.0
             prices.append(
                 Price(
                     ticker=ticker,
-                    dt=date(2024, 1, i) if i <= 31 else date(2024, 2, i - 31),
+                    dt=current_date,
                     open=base_price + i * 0.5,
                     high=base_price + i * 0.5 + 2.0,
                     low=base_price + i * 0.5 - 1.0,

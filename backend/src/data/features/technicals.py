@@ -34,7 +34,8 @@ def compute_technical_indicators(df: pd.DataFrame) -> pd.DataFrame:
         DataFrame with technical indicators added
     """
     if df.empty:
-        return df
+        # Maintain consistent schema even for empty input
+        return _add_nan_columns(df)
     
     # Ensure required columns exist
     required_cols = ["ticker", "dt", "open", "high", "low", "close", "volume", "adj_close"]

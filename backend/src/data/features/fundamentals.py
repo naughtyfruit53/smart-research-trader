@@ -140,7 +140,8 @@ def _compute_cross_sectional_zscores(df: pd.DataFrame) -> pd.DataFrame:
         std = grouped.transform("std")
         
         # Z-score: (value - mean) / std
-        # Use negative z-score for PE/PB (lower is better for valuation)
+        # Negative z-score for PE/PB: lower valuation ratios = better score
+        # Example: PE=10 below mean of 15 -> positive score (undervalued)
         df[f"{metric}_vs_sector"] = -(df[metric] - mean) / std
         
         # Replace inf with NaN
