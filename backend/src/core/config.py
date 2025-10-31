@@ -51,6 +51,11 @@ class Settings(BaseSettings):
     FEATURES_TASK_HOUR: int = 23
     FEATURES_TASK_MINUTE: int = 30
 
+    # API scoring and signal configuration
+    RISK_SCORE_WEIGHT: float = 0.7  # Blend weight between base_score and composite_score
+    SIGNAL_TOP_DEFAULT: int = 50  # Default number of top signals to return
+    SHAP_TOP_K: int = 12  # Number of top SHAP features to return
+
 
 settings = Settings()
 
