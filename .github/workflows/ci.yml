@@ -17,6 +17,31 @@ jobs:
       run:
         working-directory: backend
 
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_DB: smart_trader
+          POSTGRES_USER: trader
+          POSTGRES_PASSWORD: trader_dev_pass
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+      redis:
+        image: redis:7-alpine
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 6379:6379
+
     steps:
       - uses: actions/checkout@v4
 
@@ -43,6 +68,12 @@ jobs:
         run: mypy src tests --ignore-missing-imports
 
       - name: Run pytest
+        env:
+          DATABASE_URL: postgresql://trader:trader_dev_pass@localhost:5432/smart_trader
+          CELERY_BROKER_URL: redis://localhost:6379/0
+          CELERY_RESULT_BACKEND: redis://localhost:6379/0
+          SKIP_NETWORK_IN_TESTS: true
+          ENABLE_FINBERT: false
         run: pytest
 
   frontend-typecheck-build:

@@ -25,10 +25,7 @@ class PriceRepository:
         """Get latest prices for a ticker."""
         return list(
             db.execute(
-                select(Price)
-                .where(Price.ticker == ticker)
-                .order_by(desc(Price.dt))
-                .limit(limit)
+                select(Price).where(Price.ticker == ticker).order_by(desc(Price.dt)).limit(limit)
             ).scalars()
         )
 
@@ -37,9 +34,7 @@ class NewsRepository:
     """Repository for News operations."""
 
     @staticmethod
-    def get_by_ticker(
-        db: Session, ticker: str, limit: int = 100, offset: int = 0
-    ) -> list[News]:
+    def get_by_ticker(db: Session, ticker: str, limit: int = 100, offset: int = 0) -> list[News]:
         """Get news articles for a ticker."""
         return list(
             db.execute(
@@ -107,14 +102,10 @@ class PredRepository:
     @staticmethod
     def get_latest_by_date(db: Session, dt: date, limit: int = 100) -> list[Pred]:
         """Get latest predictions by date."""
-        return list(
-            db.execute(select(Pred).where(Pred.dt == dt).limit(limit)).scalars()
-        )
+        return list(db.execute(select(Pred).where(Pred.dt == dt).limit(limit)).scalars())
 
     @staticmethod
-    def get_by_ticker(
-        db: Session, ticker: str, limit: int = 100, offset: int = 0
-    ) -> list[Pred]:
+    def get_by_ticker(db: Session, ticker: str, limit: int = 100, offset: int = 0) -> list[Pred]:
         """Get predictions for a ticker."""
         return list(
             db.execute(
@@ -127,9 +118,7 @@ class PredRepository:
         )
 
     @staticmethod
-    def get_by_ticker_date_horizon(
-        db: Session, ticker: str, dt: date, horizon: str
-    ) -> Pred | None:
+    def get_by_ticker_date_horizon(db: Session, ticker: str, dt: date, horizon: str) -> Pred | None:
         """Get prediction by ticker, date, and horizon."""
         return db.execute(
             select(Pred).where(Pred.ticker == ticker, Pred.dt == dt, Pred.horizon == horizon)
@@ -142,17 +131,13 @@ class BacktestRepository:
     @staticmethod
     def get_by_run_id(db: Session, run_id: UUID) -> Backtest | None:
         """Get backtest by run_id."""
-        return db.execute(
-            select(Backtest).where(Backtest.run_id == run_id)
-        ).scalar_one_or_none()
+        return db.execute(select(Backtest).where(Backtest.run_id == run_id)).scalar_one_or_none()
 
     @staticmethod
     def get_latest(db: Session, limit: int = 10) -> list[Backtest]:
         """Get latest backtests."""
         return list(
-            db.execute(
-                select(Backtest).order_by(desc(Backtest.started_at)).limit(limit)
-            ).scalars()
+            db.execute(select(Backtest).order_by(desc(Backtest.started_at)).limit(limit)).scalars()
         )
 
     @staticmethod
