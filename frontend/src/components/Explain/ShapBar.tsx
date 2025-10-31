@@ -40,8 +40,8 @@ export function ShapBar({ contributions, topK = 10 }: ShapBarProps) {
               border: '1px solid hsl(var(--border))',
               borderRadius: '6px',
             }}
-            formatter={(value: number, _name: string, props: any) => [
-              `${value.toFixed(4)} (value: ${props.payload.value?.toFixed(2) ?? 'N/A'})`,
+            formatter={(value: number, _name: string, props: { payload?: { value?: number } }) => [
+              `${value.toFixed(4)} (value: ${props.payload?.value?.toFixed(2) ?? 'N/A'})`,
               'Contribution',
             ]}
           />

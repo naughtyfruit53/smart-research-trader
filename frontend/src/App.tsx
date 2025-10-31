@@ -24,7 +24,7 @@ function App() {
   }
 
   return (
-    <ThemeProvider defaultTheme={theme as any} storageKey="smart-trader-theme">
+    <ThemeProvider defaultTheme={theme as 'dark' | 'light' | 'system'} storageKey="smart-trader-theme">
       <Router>
         <div className="min-h-screen bg-background">
           <Navigation theme={theme} toggleTheme={toggleTheme} />
