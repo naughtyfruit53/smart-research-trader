@@ -224,9 +224,7 @@ def test_pred_repository_get_by_ticker_date_horizon(db_session: Session):
     db_session.add(pred)
     db_session.commit()
 
-    result = PredRepository.get_by_ticker_date_horizon(
-        db_session, "AAPL", date(2024, 1, 1), "1d"
-    )
+    result = PredRepository.get_by_ticker_date_horizon(db_session, "AAPL", date(2024, 1, 1), "1d")
     assert result is not None
     assert result.yhat == 0.015
 
@@ -271,9 +269,7 @@ def test_backtest_repository_create(db_session: Session):
     params = {"strategy": "momentum", "lookback": 30}
     metrics = {"sharpe": 1.5}
 
-    backtest = BacktestRepository.create(
-        db_session, run_id, started_at, params, metrics=metrics
-    )
+    backtest = BacktestRepository.create(db_session, run_id, started_at, params, metrics=metrics)
 
     assert backtest.run_id == run_id
     assert backtest.params["strategy"] == "momentum"

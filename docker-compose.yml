@@ -37,6 +37,12 @@ services:
       - CORS_ORIGINS=["http://localhost:5173","http://localhost:3000"]
       - LOG_LEVEL=INFO
       - DATABASE_URL=postgresql://trader:trader_dev_pass@postgres:5432/smart_trader
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+      - PRICE_PROVIDER=yf
+      - NEWS_PROVIDER=rss
+      - ENABLE_FINBERT=false
+      - TICKERS=RELIANCE.NS,TCS.NS,INFY.NS,HDFCBANK.NS,ICICIBANK.NS
     ports:
       - "8000:8000"
     volumes:
@@ -51,10 +57,38 @@ services:
     build:
       context: ./backend
       dockerfile: celeryworker.dockerfile
-    command: ["sleep", "infinity"]
+    command: sh -lc "celery -A src.core.celery_app.celery_app worker -l info"
     environment:
       - APP_ENV=development
       - DATABASE_URL=postgresql://trader:trader_dev_pass@postgres:5432/smart_trader
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+      - PRICE_PROVIDER=yf
+      - NEWS_PROVIDER=rss
+      - ENABLE_FINBERT=false
+      - SKIP_NETWORK_IN_TESTS=false
+      - TICKERS=RELIANCE.NS,TCS.NS,INFY.NS,HDFCBANK.NS,ICICIBANK.NS
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  beat:
+    build:
+      context: ./backend
+      dockerfile: celeryworker.dockerfile
+    command: sh -lc "celery -A src.core.celery_app.celery_app beat -l info"
+    environment:
+      - APP_ENV=development
+      - DATABASE_URL=postgresql://trader:trader_dev_pass@postgres:5432/smart_trader
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+      - PRICE_PROVIDER=yf
+      - NEWS_PROVIDER=rss
+      - ENABLE_FINBERT=false
+      - SKIP_NETWORK_IN_TESTS=false
+      - TICKERS=RELIANCE.NS,TCS.NS,INFY.NS,HDFCBANK.NS,ICICIBANK.NS
     depends_on:
       postgres:
         condition: service_healthy

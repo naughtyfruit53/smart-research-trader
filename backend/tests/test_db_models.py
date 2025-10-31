@@ -25,9 +25,7 @@ def test_price_model(db_session: Session):
 
     # Retrieve and verify
     retrieved = (
-        db_session.query(Price)
-        .filter(Price.ticker == "AAPL", Price.dt == date(2024, 1, 1))
-        .first()
+        db_session.query(Price).filter(Price.ticker == "AAPL", Price.dt == date(2024, 1, 1)).first()
     )
     assert retrieved is not None
     assert retrieved.ticker == "AAPL"
