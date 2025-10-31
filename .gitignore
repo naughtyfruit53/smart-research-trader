@@ -90,3 +90,10 @@ docker-compose.override.yml
 # Logs
 logs/
 *.log
+
+# ML artifacts
+backend/artifacts/models/
+*.pkl
+*.joblib
+*.h5
+*.onnx
