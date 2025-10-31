@@ -97,7 +97,7 @@ def compute_and_upsert_features(
     
     # Clean features
     logger.info("Cleaning features...")
-    features_df = clean_features(features_df, nan_threshold=0.8)
+    features_df = clean_features(features_df, nan_threshold=settings.FEATURE_NAN_THRESHOLD)
     
     # Compute composite scores
     logger.info("Computing composite scores...")
@@ -184,9 +184,12 @@ def _read_news(
     session, tickers: list[str], start_date: date, end_date: date
 ) -> pd.DataFrame:
     """Read news data from database."""
+    from datetime import time
+    
     # Convert dates to datetime for comparison with timestamp column
-    start_dt = datetime.combine(start_date, datetime.min.time())
-    end_dt = datetime.combine(end_date, datetime.max.time())
+    # News dt is timezone-aware, so we compare using date boundaries
+    start_dt = datetime.combine(start_date, time.min)
+    end_dt = datetime.combine(end_date, time.max)
     
     stmt = select(News).where(
         News.ticker.in_(tickers),

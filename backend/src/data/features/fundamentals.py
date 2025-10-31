@@ -22,12 +22,20 @@ def asof_join_fundamentals(
     Returns:
         DataFrame with fundamentals joined to trading days, forward-filled up to FUND_FFILL_DAYS
     """
-    if trading_days_df.empty or fundamentals_df.empty:
+    if trading_days_df.empty:
+        return trading_days_df
+    
+    if fundamentals_df.empty:
         # Return trading days with NaN fundamentals columns
+        # Define standard fundamental columns
+        fundamental_cols = [
+            "pe", "pb", "ev_ebitda", "roe", "roce", "de_ratio",
+            "eps_g3y", "rev_g3y", "profit_g3y", "opm", "npm",
+            "div_yield", "promoter_hold", "pledged_pct"
+        ]
         result = trading_days_df.copy()
-        for col in fundamentals_df.columns:
-            if col not in ["ticker", "asof"]:
-                result[col] = float("nan")
+        for col in fundamental_cols:
+            result[col] = float("nan")
         return result
     
     # Ensure proper types and sorting

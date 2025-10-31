@@ -93,8 +93,8 @@ def aggregate_news_sentiment(
     # Drop temporary columns
     result = result.drop(columns=["date", "headline_count"])
     
-    # Ensure integer types for burst counts
-    result["burst_3d"] = result["burst_3d"].astype(int)
-    result["burst_7d"] = result["burst_7d"].astype(int)
+    # Ensure integer types for burst counts, filling any remaining NaN with 0
+    result["burst_3d"] = result["burst_3d"].fillna(0).astype(int)
+    result["burst_7d"] = result["burst_7d"].fillna(0).astype(int)
     
     return result

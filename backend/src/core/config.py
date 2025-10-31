@@ -1,5 +1,8 @@
 """Application configuration using pydantic-settings."""
 
+import json
+from pathlib import Path
+
 from pydantic import ConfigDict
 from pydantic_settings import BaseSettings
 
@@ -41,6 +44,7 @@ class Settings(BaseSettings):
     # Feature engineering configuration
     FEATURE_LOOKBACK_DAYS: int = 400
     FUND_FFILL_DAYS: int = 120
+    FEATURE_NAN_THRESHOLD: float = 0.8
     COMPOSITE_WEIGHTS: str = '{"quality": 0.25, "valuation": 0.25, "momentum": 0.25, "sentiment": 0.25}'
     SECTOR_MAP_PATH: str = ""
     ENABLE_FEATURES_TASK: bool = False
@@ -55,7 +59,6 @@ def get_composite_weights() -> dict[str, float]:
     Returns:
         Dictionary with weights for quality, valuation, momentum, sentiment
     """
-    import json
     try:
         weights = json.loads(settings.COMPOSITE_WEIGHTS)
         # Ensure all required keys exist with defaults
@@ -80,9 +83,6 @@ def load_sector_mapping() -> dict[str, str] | None:
         return None
     
     try:
-        import json
-        from pathlib import Path
-        
         path = Path(settings.SECTOR_MAP_PATH)
         if not path.exists():
             return None

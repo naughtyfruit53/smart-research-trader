@@ -1,7 +1,6 @@
 """Technical indicators computation using ta library."""
 
 import logging
-from typing import Any
 
 import pandas as pd
 from ta.momentum import RSIIndicator
@@ -58,7 +57,8 @@ def compute_technical_indicators(df: pd.DataFrame) -> pd.DataFrame:
             high_prices = ticker_df["high"]
             low_prices = ticker_df["low"]
             
-            # Skip if insufficient data (need at least 200 days for longest indicator)
+            # Skip if insufficient data (need at least 20 days for shortest indicator)
+            # Note: Longer indicators (SMA_200) will have NaN for first 200 days
             if len(ticker_df) < 20:
                 logger.debug(f"Skipping {ticker}: insufficient data ({len(ticker_df)} rows)")
                 # Add NaN columns
