@@ -1,7 +1,8 @@
 """Logging configuration for the application."""
+
 import logging
 import sys
-from typing import Any, Dict
+from typing import Any
 
 from .config import settings
 
@@ -11,7 +12,7 @@ class JSONFormatter(logging.Formatter):
 
     def format(self, record: logging.LogRecord) -> str:
         """Format log record as JSON."""
-        log_data: Dict[str, Any] = {
+        log_data: dict[str, Any] = {
             "timestamp": self.formatTime(record),
             "level": record.levelname,
             "logger": record.name,

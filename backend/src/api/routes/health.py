@@ -1,4 +1,5 @@
 """Health check endpoint."""
+
 from fastapi import APIRouter
 
 from ...core.utils import get_version
