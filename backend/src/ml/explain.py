@@ -49,7 +49,8 @@ def explain_prediction(
         raise FileNotFoundError(f"Model not found at {model_path}")
     
     logger.info(f"Loading model from {model_path}")
-    model = LGBMForecaster.load(str(model_file))
+    model = LGBMForecaster()
+    model.load(str(model_file))
     
     # Get features for this ticker and date
     feature_row = FeatureRepository.get_by_ticker_date(db, ticker, dt)
