@@ -7,6 +7,7 @@ import {
   flexRender,
   createColumnHelper,
   SortingState,
+  OnChangeFn,
 } from '@tanstack/react-table'
 import { ArrowUpDown, ChevronLeft, ChevronRight } from 'lucide-react'
 import { SignalItem } from '@/lib/api'
@@ -85,7 +86,7 @@ const columns = [
 interface SignalsTableProps {
   signals: SignalItem[]
   sorting: SortingState
-  onSortingChange: (updater: SortingState | ((old: SortingState) => SortingState)) => void
+  onSortingChange: OnChangeFn<SortingState>
 }
 
 export function SignalsTable({ signals, sorting, onSortingChange }: SignalsTableProps) {
