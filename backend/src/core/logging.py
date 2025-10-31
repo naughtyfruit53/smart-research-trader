@@ -1,5 +1,6 @@
 """Logging configuration for the application."""
 
+import json
 import logging
 import sys
 from typing import Any
@@ -20,7 +21,7 @@ class JSONFormatter(logging.Formatter):
         }
         if record.exc_info:
             log_data["exception"] = self.formatException(record.exc_info)
-        return str(log_data)
+        return json.dumps(log_data)
 
 
 def setup_logging() -> None:
