@@ -14,6 +14,7 @@ class Settings(BaseSettings):
     API_PORT: int = 8000
     CORS_ORIGINS: list[str] = ["http://localhost:5173"]
     LOG_LEVEL: str = "INFO"
+    DATABASE_URL: str = "postgresql://trader:trader_dev_pass@localhost:5432/smart_trader"
 
 
 settings = Settings()
