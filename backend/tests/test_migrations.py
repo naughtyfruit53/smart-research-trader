@@ -92,8 +92,6 @@ def test_migration_schema_consistency():
     assert "params" in bt_columns
     assert "metrics" in bt_columns
 
-    engine.dispose()
-
 
 def test_database_migration_current():
     """Test that database is at the expected migration version."""
@@ -111,5 +109,3 @@ def test_database_migration_current():
         version = result.scalar()
         assert version is not None
         assert len(version) > 0
-
-    engine.dispose()
